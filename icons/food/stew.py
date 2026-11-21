@@ -1,32 +1,36 @@
-from pixelkit import ellipse, rect, poly, line
+from pixelkit import blob, line
 
 
 def draw(c):
-    # bowl body: lower half of a wide ellipse
-    body = ellipse(15.5, 16, 13, 12) & rect(0, 17, 31, 29)
-    body |= rect(3, 15, 28, 18)
-    c.fill(body, "brown")
-    # rim + stew surface
-    rim = ellipse(15.5, 15.5, 13, 4.5)
-    c.fill(rim, "brown3")
-    c.fill(ellipse(15.5, 16, 11, 3.2), "orange2")
-    c.fill(ellipse(15.5, 17, 10, 2.2), "orange1")
-    c.fill(ellipse(14.5, 15.3, 9.5, 2.4), "orange2")
-    # bowl base
-    c.fill(rect(10, 27, 21, 28), "brown1")
-    # bowl band
-    c.line(5, 21, 26, 21, "brown1")
-    # chunks
-    c.fill({(9, 15), (10, 15), (9, 16), (10, 16)}, "orange3")
-    c.fill({(19, 14), (20, 14), (19, 15), (20, 15), (21, 15)}, "red2")
-    c.fill({(14, 16), (15, 16), (14, 17), (15, 17)}, "red2")
-    c.fill({(16, 14), (17, 14)}, "green2")
-    c.fill({(12, 17), (22, 16)}, "green2")
-    c.fill({(7, 16), (8, 16)}, "orange4")
-    # bowl highlight
-    c.fill({(5, 19), (5, 20), (6, 22), (6, 23)}, "brown4")
-    # steam: 2px wide wisps
-    for x in (9, 15, 21):
-        c.fill({(x + 1, 11), (x, 10), (x, 9), (x + 1, 8), (x + 1, 7), (x, 6), (x, 5),
-                (x + 2, 11), (x + 1, 10), (x + 1, 9), (x + 2, 8), (x + 2, 7), (x + 1, 6), (x + 1, 5)}, "gray3")
-    c.fill({(16, 5), (16, 6), (17, 7)}, "gray4")
+    # 그릇 몸통: 위가 넓고 아래로 둥글게 좁아지는 사발 (살짝 비대칭)
+    bowl = blob([
+        (3.5, 15), (10, 14), (21, 14), (28, 15),
+        (27, 21), (23.5, 26), (18, 28.5), (12.5, 28.5), (8, 26), (4.5, 21),
+    ])
+    c.fill(bowl, "brown", round=3)
+    # 굽
+    c.fill(line(11, 28, 19, 28), "brown1")
+    # 입술(림)과 스튜 표면
+    rim = blob([(3.5, 15), (8, 11), (16, 9.5), (24, 11), (28, 15), (24, 19), (16, 20.3), (8, 19)])
+    c.fill(rim, "brown", round=2)
+    surface = blob([(5.5, 15), (9, 12.2), (16, 11.2), (23, 12.2), (26, 15), (23, 18), (16, 19), (9, 18)])
+    c.fill(surface, "orange", round=2)
+    # 건더기: 당근, 고기, 완두콩 (겹침 그림자 후 칠하기)
+    carrot = blob([(8, 15), (10.5, 13.5), (13, 14.5), (12.5, 16.8), (9.5, 17)])
+    c.cast(carrot)
+    c.fill(carrot, "orange3")
+    c.px(10, 14, "orange4")
+    meat = blob([(17.5, 14.5), (20.5, 12.8), (24, 14.2), (23, 17), (19, 17.3)])
+    c.cast(meat)
+    c.fill(meat, "red", round=2)
+    pea = {(14, 16), (15, 16), (14, 17), (15, 17)}
+    c.cast(pea)
+    c.fill(pea, "green2")
+    c.px(14, 16, "green3")
+    c.fill({(17, 12), (18, 12), (12, 12)}, "green2")
+    # 그릇 하이라이트
+    c.fill({(5, 21), (5, 22), (6, 24), (7, 25)}, "brown4")
+    # 김: 짧은 두 가닥
+    for x in (11, 19):
+        c.fill({(x + 1, 6), (x, 5), (x, 4), (x + 1, 3),
+                (x + 2, 6), (x + 1, 5), (x + 1, 4), (x + 2, 3)}, "gray3")

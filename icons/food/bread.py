@@ -1,16 +1,23 @@
-from pixelkit import ellipse, line
+from pixelkit import blob, line
 
 
 def draw(c):
-    # 둥근 시골빵: 위쪽이 부푼 돔 + 아래 약간 넓은 밑단
-    body = ellipse(15.5, 15.5, 13, 9.5) | ellipse(15.5, 19.5, 12, 7.5)
-    c.fill(body, "tan")
-    # 바닥 쪽 진한 구움색
-    c.recolor({(x, y) for x in range(32) for y in range(24, 30)}, "tan1")
-    # 칼집 3개: 속살(밝음) + 아래쪽 어두운 가장자리
-    for (x0, y0, x1, y1) in [(8, 16, 12, 10), (13, 17, 17, 11), (18, 18, 22, 12)]:
-        c.fill(line(x0, y0 + 1, x1, y1 + 1), "tan1")
-        c.fill(line(x0, y0, x1, y1), "cream3")
-    # 하이라이트
-    c.fill({(6, 13), (7, 12), (8, 11), (9, 10), (6, 14)}, "tan4")
-    c.fill({(11, 8), (12, 7), (13, 7)}, "tan4")
+    # 밑단: 진하게 구워진 껍질 (뒤쪽, 먼저)
+    base = blob([(5, 21), (9, 20), (23, 20), (27.5, 21.5), (28, 25), (24, 28), (16, 28.5), (8, 28), (4, 25)])
+    c.fill(base, "brown", round=3)
+    # 돔: 높이가 확실한 둥근 덩어리, 아래가 살짝 넓다
+    dome = blob([(15, 5.5), (21, 6.5), (26, 11), (28, 17), (27, 23), (21, 25), (11, 25), (5, 23), (4, 17), (6.5, 11), (10, 7)])
+    c.cast(dome)
+    c.fill(dome, "tan")
+    # 칼집 3개: 돔 윗면을 따라 부채꼴로 휘어진다. 속살 + 아래 그늘
+    slashes = [
+        [(8, 16), (9, 13), (11, 11)],
+        [(13, 18), (14, 14), (16, 10)],
+        [(19, 18), (20, 15), (23, 12)],
+    ]
+    for pts in slashes:
+        m = line(*pts[0], *pts[1]) | line(*pts[1], *pts[2])
+        c.recolor({(x + 1, y + 1) for (x, y) in m}, "tan1")
+        c.recolor(m, "cream3")
+    # 밀가루 흔적 (윗면, 몇 점만)
+    c.recolor({(16, 8), (17, 8), (12, 9), (21, 10)}, "cream3")
