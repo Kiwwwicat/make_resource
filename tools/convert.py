@@ -58,7 +58,7 @@ def cell_size(a):
             change = np.abs(np.diff(row, axis=0)).sum(axis=1) > 40
             idx = np.flatnonzero(change)
             runs = np.diff(idx)
-            for r in runs[(runs >= 10) & (runs < 200)]:
+            for r in runs[(runs >= 5) & (runs < 200)]:
                 hist[r] += 1
     sm = np.convolve(hist, np.ones(5), mode="same")
     return float(np.argmax(sm))
@@ -240,8 +240,11 @@ def convert_sheet(path, cat, ids, cols=2):
 def main(argv):
     if not argv:
         print(__doc__); return 2
-    if argv[0] == "--sheet":   # --sheet <png> <category> <id> <id> ...
-        convert_sheet(argv[1], argv[2], argv[3:])
+    if argv[0] == "--sheet":   # --sheet <png> <category> [--cols N] <id> <id> ...
+        rest, cols = argv[3:], 2
+        if rest and rest[0] == "--cols":
+            cols, rest = int(rest[1]), rest[2:]
+        convert_sheet(argv[1], argv[2], rest, cols)
         return 0
     for t in argv:
         if "/" in t:
