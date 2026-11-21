@@ -336,7 +336,7 @@ class Canvas:
                     out[(x, y)] = (ramp, 0)
         return out
 
-    def lint(self):
+    def lint(self, lo=FILL_MIN, hi=FILL_MAX, max_ramps=5, max_colors=16):
         """(errors, warnings) 목록. errors가 있으면 납품 불가."""
         err, warn = [], []
         if not self.pix:
@@ -344,8 +344,8 @@ class Canvas:
         xs = [p[0] for p in self.pix]
         ys = [p[1] for p in self.pix]
         x0, x1, y0, y1 = min(xs), max(xs), min(ys), max(ys)
-        if x0 < FILL_MIN or y0 < FILL_MIN or x1 > FILL_MAX or y1 > FILL_MAX:
-            err.append(f"채색 영역 초과: x {x0}..{x1}, y {y0}..{y1} (허용 {FILL_MIN}..{FILL_MAX})")
+        if x0 < lo or y0 < lo or x1 > hi or y1 > hi:
+            err.append(f"채색 영역 초과: x {x0}..{x1}, y {y0}..{y1} (허용 {lo}..{hi})")
         w, h = x1 - x0 + 1, y1 - y0 + 1
         if max(w, h) < 22:
             err.append(f"너무 작음: {w}x{h} (긴 변이 22px 이상이어야 함, 권장 24~28)")
@@ -355,11 +355,11 @@ class Canvas:
         if abs(cx) > 1.5 or abs(cy) > 1.5:
             err.append(f"중심 어긋남: dx={cx:+.1f}, dy={cy:+.1f} (허용 ±1.5)")
         ramps = Counter(r for r, _ in self.pix.values())
-        if len(ramps) > 5:
-            err.append(f"램프 과다: {len(ramps)}개 {sorted(ramps)} (최대 5)")
+        if len(ramps) > max_ramps:
+            err.append(f"램프 과다: {len(ramps)}개 {sorted(ramps)} (최대 {max_ramps})")
         colors = set(self.pix.values())
-        if len(colors) > 16:
-            err.append(f"색 과다: {len(colors)}색 (최대 16)")
+        if len(colors) > max_colors:
+            err.append(f"색 과다: {len(colors)}색 (최대 {max_colors})")
         if len(colors) < 3:
             err.append("명암 없음: 3색 미만")
         sp = sorted(_spikes(set(self.pix)))

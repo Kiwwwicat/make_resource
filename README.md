@@ -4,26 +4,33 @@ BOOTH 출품용 TRPG 소재 아이콘을 **코드로 그려서** 생산하는 �
 아이콘은 PNG를 직접 만들지 않고 `icons/<category>/<id>.py`의 그리기 코드로 정의하며,
 빌드 도구가 팔레트·명암·외곽선·규격을 강제해 작업자가 달라도 같은 품질이 나오게 한다.
 
-## 왜 이 방식인가
+## 제작 방식 (v3: 생성 AI 원본 + 규격 변환)
 
-| 문제 | 해결 |
-|---|---|
-| 이미지 생성 AI는 32px 격자·팔레트·투명도를 정확히 지키지 못하고 장마다 화풍이 흔들림 | 픽셀을 코드로 지정 → 결과가 결정적이고 재현 가능 |
-| 작업자(모델)마다 색·외곽선·광원이 다름 | 60색 마스터 팔레트, 자동 명암(좌상단 광원), 자동 외곽선을 도구가 처리 |
-| 크기·여백·중심이 들쭉날쭉 | `lint`가 여백/크기/중심/색 수를 검사, ERROR면 납품물에서 제외 |
-| "그려놓고 안 봄" | 작업자는 매 반복마다 미리보기 PNG를 직접 보고 체크리스트로 자가 점검 |
-| 나중에 팔레트·외곽선을 바꾸고 싶음 | 소스가 코드라 전체 재빌드 한 번으로 일괄 반영 |
+코드로만 그린 v1/v2는 형태가 인위적이고 가시 픽셀이 남아 반려됨. 현재는 2단계로 만든다.
 
-## 역할 분담 (상위 모델 계획 → 하위 모델 실행)
+1. **원본 생성** — 이미지 생성 AI(Figma 이미지 생성, `gpt-image-2.5-flare`)에 공통 화풍 프롬프트 + 아이콘별 묘사를 넣어
+   마젠타/시안 단색 배경의 큰 픽셀아트 이미지를 받는다 → `source/<category>/<id>.png`
+2. **규격 변환** — `tools/convert.py`가 원본의 픽셀 격자를 추정해 칸마다 대표색을 뽑고, 배경 제거 →
+   30×30 안에 맞춤 → 60색 마스터 팔레트로 양자화 → 가시 픽셀 제거 → 외곽선 색 통일 → 중앙 정렬 → `pixels/<category>/<id>.png`
+3. **검사·납품** — `tools/build.py`가 규격(여백·크기·중심·팔레트·가시 픽셀)을 검사하고 `dist/`를 만든다.
 
-1. **상위 모델 (기획·감수)**: 카테고리와 `catalog/<category>.csv` 작성, 도구·스타일 가이드 유지, 기준 아이콘 제작, 대조 시트 검수 후 반려/수정 지시.
-2. **하위 모델 (제작)**: 5~6개 묶음을 병렬로 배정받아 `docs/STYLE_GUIDE.md`의 작업 루프(작성 → 빌드 → 미리보기 확인 → 수정)를 아이콘당 2~6회 반복.
-3. **게이트**: ① lint ERROR 0 → ② 작업자 자가 점검 → ③ 상위 모델의 대조 시트 검수 → ④ 사람의 최종 확인.
+화풍은 생성 AI가, **규격의 균일함(크기·팔레트·외곽선·투명도)은 변환 도구가** 책임진다.
+
+공통 프롬프트 요령 (실측):
+- "32x32 pixel art ... every pixel a large crisp square" 만으로는 실제 격자가 40~55칸으로 나와 축소 시 디테일이 뭉개진다.
+  **"the whole drawing is only 24 pixels wide and 24 pixels tall, extremely chunky"** 라고 써야 30칸 이내로 나온다 (변환 로그의 "축소 n배"가 1.3 이상이면 재생성).
+- 배경은 물체에 없는 색으로: 기본 마젠타, 분홍·보라·빨강 계열 물체는 시안.
+- 구멍이 있는 물체(도넛, 손잡이)는 "구멍 안도 배경색"이라고 명시.
+- 글자가 들어갈 만한 곳(라벨)은 "blank, no writing".
+
+역할 분담: 상위 모델이 목록·프롬프트·변환 도구·검수를 맡고, 생성 호출과 재생성은 묶음 단위로 반복 실행한다.
+`icons/*.py`(코드로 그린 v2)는 `pixels/`에 같은 id가 없을 때만 쓰이는 대체 경로로 남겨 둔다.
 
 ## 사용법
 
 ```
-pip install pillow
+pip install pillow numpy
+python tools/convert.py food       # source/food/*.png -> pixels/food/*.png (32px, 마스터 팔레트)
 python tools/build.py food/apple   # 1개 검사 + build/preview/food/apple.png
 python tools/build.py food         # 카테고리 빌드 → dist/food/
 python tools/build.py --all
@@ -45,8 +52,10 @@ python tools/build.py --all
 
 ```
 catalog/   카테고리별 아이콘 목록 (id, 한/일/영 이름, 한 줄 지시)
-icons/     아이콘 소스 (.py)
-tools/     pixelkit.py (팔레트·도형·명암·외곽선·lint), build.py (빌드 CLI)
+source/    생성 AI 원본 (1024px, 단색 배경)
+pixels/    변환된 확정 32px 아이콘 (빌드 입력)
+icons/     코드로 그린 아이콘 (.py, 대체 경로)
+tools/     convert.py (원본→32px 변환), pixelkit.py (팔레트·lint·코드 드로잉), build.py (빌드 CLI)
 docs/      STYLE_GUIDE.md (작업 지침서)
 dist/      납품물 (빌드 결과, 커밋됨)
 ```

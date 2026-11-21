@@ -24,6 +24,28 @@ BG_DARK, BG_LIGHT = (38, 38, 46, 255), (236, 232, 222, 255)
 
 
 def render(cat, icon_id):
+    """pixels/<cat>/<id>.png (AI 원본을 변환한 확정 픽셀)가 있으면 그것을,
+    없으면 icons/<cat>/<id>.py (코드로 그린 아이콘)를 렌더한다."""
+    png = ROOT / "pixels" / cat / f"{icon_id}.png"
+    if png.exists():
+        img = Image.open(png).convert("RGBA")
+        back = {pk.rgb(r, s): (r, s) for r in pk.PALETTE for s in range(5)}
+        c = pk.Canvas()
+        bad = 0
+        for y in range(pk.SIZE):
+            for x in range(pk.SIZE):
+                px = img.getpixel((x, y))
+                if px[3] == 0:
+                    continue
+                if px in back:
+                    c.pix[(x, y)] = back[px]
+                else:
+                    bad += 1
+        err, warn = c.lint(lo=1, hi=30, max_ramps=9, max_colors=28)
+        warn = [w for w in warn if "고립 픽셀" not in w]
+        if bad:
+            err.append(f"팔레트 밖 색 또는 반투명 픽셀 {bad}개")
+        return img, (err, warn)
     path = ROOT / "icons" / cat / f"{icon_id}.py"
     spec = importlib.util.spec_from_file_location(f"icon_{cat}_{icon_id}", path)
     mod = importlib.util.module_from_spec(spec)
@@ -100,7 +122,7 @@ def build_category(cat):
     done, missing, failed = [], [], []
     for row in rows:
         iid = row["id"]
-        if not (ROOT / "icons" / cat / f"{iid}.py").exists():
+        if not (ROOT / "icons" / cat / f"{iid}.py").exists() and not (ROOT / "pixels" / cat / f"{iid}.png").exists():
             missing.append(iid)
             continue
         img, lint = render(cat, iid)
