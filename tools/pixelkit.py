@@ -54,6 +54,8 @@ def rect(x0, y0, x1, y1):
 def ellipse(cx, cy, rx, ry):
     """중심(cx,cy), 반지름(rx,ry). 짝수 폭은 cx=15.5 처럼 .5 중심을 쓴다."""
     out = set()
+    if rx <= 0 or ry <= 0:
+        return out
     for y in range(SIZE):
         for x in range(SIZE):
             if ((x - cx) / rx) ** 2 + ((y - cy) / ry) ** 2 <= 1.0:
@@ -97,6 +99,22 @@ def poly(points):
                 if (ya > y) != (yb > y) and x < (xb - xa) * (y - ya) / (yb - ya) + xa:
                     inside = not inside
             if inside:
+                out.add((x, y))
+    return out
+
+
+def rotate(mask, deg, cx=15.5, cy=15.5):
+    """마스크를 (cx,cy) 기준 시계 방향으로 deg도 회전. 가는 물체의 대각선 배치용.
+    똑바로 세워서 만든 뒤 마지막에 돌린다 (보통 45 또는 -45)."""
+    import math
+    a = math.radians(deg)
+    ca, sa = math.cos(a), math.sin(a)
+    out = set()
+    for y in range(SIZE):
+        for x in range(SIZE):
+            dx, dy = x - cx, y - cy
+            src = (round(cx + dx * ca + dy * sa), round(cy - dx * sa + dy * ca))
+            if src in mask:
                 out.add((x, y))
     return out
 
