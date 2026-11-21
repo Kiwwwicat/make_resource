@@ -19,7 +19,7 @@ def draw(c):
     # hole with depth
     c.erase(hole)
     rim = blob([(15, 11.5), (19.5, 12.5), (21, 16.5), (17.5, 20.5), (13, 20), (10.5, 16), (11.5, 12.5)]) - hole
-    inner = {p for p in rim if p in c.pix}
+    inner = rim & glaze
     c.fill({(x, y) for (x, y) in inner if (x + 1, y) in hole or (x, y + 1) in hole}, "pink1")
     c.fill({(x, y) for (x, y) in inner if (x - 1, y) in hole or (x, y - 1) in hole}, "pink3")
     # sprinkles in 3 colours, short 2px bars at varied angles
