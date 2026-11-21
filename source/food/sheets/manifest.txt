@@ -1,0 +1,4 @@
+# <시트 파일> <격자 열 수> <id ...>   ('-' = 건너뜀)
+old_4x4_food_02.png 4 - - cookie donut candy wine_bottle beer_mug tea_cup banana pear tomato corn croissant sausage honey_jar milk_bottle
+food_01.png 3 apple strawberry grapes cherry lemon carrot mushroom pumpkin bread
+food_02.png 3 cheese meat_on_bone chicken_leg grilled_fish fried_egg stew onigiri pie cake_slice

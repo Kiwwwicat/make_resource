@@ -1,0 +1,3 @@
+# <시트 파일> <격자 열 수> <id ...>   ('-' = 건너뜀)
+furniture_01.png 4 chair stool armchair sofa bench throne round_table long_table desk bed bookshelf wardrobe drawer cabinet treasure_chest barrel
+furniture_02.png 4 crate door window fireplace cauldron candelabra wall_torch mirror rug grandfather_clock piano bathtub coat_rack weapon_rack ladder painting

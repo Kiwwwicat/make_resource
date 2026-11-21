@@ -2,7 +2,7 @@
 """AI 생성 원본(큰 '가짜 픽셀아트' 이미지, 마젠타 배경) -> 규격 32x32 아이콘.
 
   python tools/convert.py food/apple      source/food/apple.png -> pixels/food/apple.png
-  python tools/convert.py food            source/food/*.png 전부
+  python tools/convert.py food            source/food/sheets/manifest.txt 의 시트 전부 (없으면 source/food/*.png)
   python tools/convert.py --sheet source/food/sheets/sheet01.png food a b c d   2x2 시트를 칸별로
 
 단계: ① 픽셀 격자 주기/위상 추정 ② 칸마다 대표색 추출 ③ 배경(마젠타) 제거
@@ -188,7 +188,6 @@ def fit(pix):
 
 def clean(pix):
     """가시 픽셀 제거, 1px 홈 메우기, 외곽선 보정. (씨앗·스프링클 같은 내부 1px 디테일은 보존)"""
-    D4 = ((1, 0), (-1, 0), (0, 1), (0, -1))
     for _ in range(3):
         sil = set(pix)
         sp = pk._spikes(sil)
@@ -212,7 +211,58 @@ def clean(pix):
                  if q in sil and q not in edge and pix[q][1] >= 1]
         new[(x, y)] = ((Counter(inner).most_common(1)[0][0] if inner else pix[(x, y)][0]), 0)
     pix.update(new)
+    fix_inner_doubles(pix, edge)
+    rim_light(pix, edge)
     return pix
+
+
+D4 = ((1, 0), (-1, 0), (0, 1), (0, -1))
+
+
+def inner_doubles(pix, edge):
+    """외곽선의 '더블 픽셀': 외곽선(투명과 변으로 맞닿은 픽셀)은 그 자체로 1px 두께인데,
+    계단의 안쪽 모서리에 어두운 픽셀이 하나 더 찍혀 ㄱ자로 겹친 곳.
+        . . # #          . . # #
+        . # D x    ->    . # x x      (D = 투명과 대각선으로만 맞닿은 어두운 픽셀 -> 채움색으로)
+        # # x x          # # x x
+    안쪽의 디테일 선(눈, 줄무늬)은 투명과 맞닿지 않으므로 해당하지 않는다."""
+    sil = set(pix)
+    out = []
+    for (x, y) in sorted(sil - edge):
+        if pix[(x, y)][1] != 0:
+            continue
+        if not any((x + i, y + j) not in sil for i in (-1, 1) for j in (-1, 1)):
+            continue
+        fill = [pix[q] for q in ((x + i, y + j) for i in (-1, 0, 1) for j in (-1, 0, 1))
+                if q in sil and q not in edge and pix[q][1] >= 1]
+        if len(fill) >= 2:
+            out.append(((x, y), Counter(fill).most_common(1)[0][0]))
+    return out
+
+
+def fix_inner_doubles(pix, edge):
+    found = inner_doubles(pix, edge)
+    for p, c in found:
+        pix[p] = c
+    return len(found)
+
+
+def rim_light(pix, edge):
+    """좌상단 광원: 위쪽/왼쪽으로만 노출된 외곽선 픽셀을, 바로 안쪽(우하단 방향) 채움색보다 두 단계 어두운
+    같은 계열 색으로 밝힌다 (빛을 받는 쪽 외곽선은 색이 돌고, 그늘 쪽은 0단계 그대로).
+    안쪽이 이미 어두우면(1단계 이하) 바꾸지 않는다."""
+    sil = set(pix)
+    n = 0
+    for (x, y) in sorted(edge):
+        if (x, y + 1) not in sil or (x + 1, y) not in sil:
+            continue   # 아래/오른쪽이 뚫린 픽셀은 그늘 쪽
+        ref = next((pix[q] for q in ((x + 1, y + 1), (x, y + 1), (x + 1, y))
+                    if q in sil and q not in edge), None)
+        if ref is None or ref[1] <= 1:
+            continue
+        pix[(x, y)] = (ref[0], min(2, ref[1] - 2) if ref[1] >= 3 else 1)
+        n += 1
+    return n
 
 
 def convert(cat, icon_id, a=None, base=None):
@@ -262,8 +312,14 @@ def main(argv):
         convert_sheet(argv[1], argv[2], rest, cols)
         return 0
     for t in argv:
+        manifest = ROOT / "source" / t / "sheets" / "manifest.txt"
         if "/" in t:
             convert(*t.split("/", 1))
+        elif manifest.exists():   # 줄마다: <시트 파일> <격자 열 수> <id> <id> ... ('-' = 건너뜀)
+            for line in manifest.read_text(encoding="utf-8").splitlines():
+                f = line.split()
+                if f and not f[0].startswith("#"):
+                    convert_sheet(manifest.parent / f[0], t, f[2:], int(f[1]))
         else:
             for f in sorted((ROOT / "source" / t).glob("*.png")):
                 convert(t, f.stem)
