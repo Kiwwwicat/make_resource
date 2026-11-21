@@ -1,46 +1,27 @@
-import math
+from pixelkit import blob, rect, rotate
 
 
 def draw(c):
-    ang = math.radians(40)          # neck points to upper right
-    ca, sa = math.cos(ang), math.sin(ang)
+    # Built upright (neck up), then turned 45 degrees so the neck points to the upper right.
+    def turn(mask):
+        return rotate(mask, 45)
 
-    def shape(test):
-        out = set()
-        for y in range(32):
-            for x in range(32):
-                dx, dy = x - 15.5, y - 15.5
-                lx = dx * ca + dy * sa      # local: +y points down the bottle
-                ly = -dx * sa + dy * ca
-                if test(lx, ly):
-                    out.add((x, y))
-        return out
-
-    # simpler explicit profile
-    def width(ly):
-        if ly > 13.5 or ly < -13.5:
-            return -1
-        if ly >= 2:
-            return 5.3 if ly < 12.5 else 4.3
-        if ly >= -4:
-            return 2.4 + (ly + 4) / 6 * 2.9      # shoulder
-        return 2.4
-    glass = shape(lambda x, y: abs(x) <= width(y))
-    c.fill(glass, "green1")
-    c.fill({(x, y) for (x, y) in glass if (x + 1, y + 1) not in glass}, "green0")
-    c.fill({(x, y) for (x, y) in glass if (x - 1, y - 1) not in glass}, "green2")
-    # foil cap on neck tip
-    foil = shape(lambda x, y: -13.5 <= y < -9 and abs(x) <= 2.4)
-    c.fill(foil, "red2")
-    c.fill({(x, y) for (x, y) in foil if (x - 1, y - 1) not in foil}, "red3")
-    c.fill({(x, y) for (x, y) in foil if (x + 1, y + 1) not in foil}, "red1")
-    # label
-    label = shape(lambda x, y: 5 <= y <= 11.5 and abs(x) <= 5.3)
-    c.fill(label, "cream2")
-    c.fill({(x, y) for (x, y) in label if (x + 1, y + 1) not in label}, "cream1")
-    c.fill({(x, y) for (x, y) in label if (x - 1, y - 1) not in label}, "cream3")
-    # label crest
-    c.recolor(shape(lambda x, y: 7.3 <= y <= 9.3 and abs(x) <= 1.8), "red2")
-    # glass highlight along left side of body
-    c.fill(shape(lambda x, y: -3 <= y <= 3.5 and -4.3 <= x <= -3.3), "green2")
-    c.fill(shape(lambda x, y: -0.5 <= y <= 2 and -4.3 <= x <= -3.3), "green3")
+    glass = blob([
+        (14, 2.5), (17.5, 2.5), (17.8, 9), (18.2, 12), (20.5, 14.2), (22, 17), (22.2, 22),
+        (21.8, 27), (20, 29.2), (15.5, 29.7), (11.5, 29.2), (9.5, 27), (9.2, 22), (9.6, 17),
+        (11.5, 14.2), (13.3, 12), (13.4, 9),
+    ])
+    c.fill(turn(glass), "green", round=3)
+    # foil cap over the neck
+    foil = turn(rect(14, 2, 17, 6))
+    c.cast(foil)
+    c.fill(foil, "red", round=2)
+    # label: plain cream band with two short lines
+    label = turn(rect(9, 21, 22, 27))
+    c.cast(label)
+    c.fill(label, "cream", round=2)
+    c.fill(turn(rect(13, 22, 18, 22)), "brown1")
+    c.fill(turn(rect(13, 26, 17, 26)), "brown1")
+    # vertical glass highlight streak on the left of the body
+    c.fill(turn(rect(11, 15, 11, 20)), "green3")
+    c.fill(turn(rect(11, 16, 11, 17)), "green4")

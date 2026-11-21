@@ -1,31 +1,27 @@
-from pixelkit import ellipse, rect
+from pixelkit import blob, rect, line
 
 
 def draw(c):
-    # saucer
-    sauc = ellipse(15.5, 24.5, 13, 3.6)
-    c.fill(sauc, "cream3")
-    c.fill({(x, y) for (x, y) in sauc if (x + 1, y + 1) not in sauc or (x, y + 1) not in sauc}, "cream2")
-    c.fill(ellipse(15.5, 23.8, 8, 1.6), "cream2")
-    # handle (right)
-    ring = (ellipse(24.5, 15.5, 4.4, 4.2) - ellipse(24.5, 15.5, 2, 2)) - rect(0, 0, 21, 31)
-    c.fill(ring, "cream3")
-    c.fill({(x, y) for (x, y) in ring if (x + 1, y + 1) not in ring}, "cream2")
-    # cup body, flat-shaded in vertical bands (rounder = darker toward right/bottom)
-    body = (ellipse(14.5, 12, 9.5, 10) & rect(0, 11, 31, 31)) | rect(5, 11, 24, 13)
-    c.fill(body, "cream3")
-    c.fill({(x, y) for (x, y) in body if (x + 3, y + 1) not in body or (x + 1, y + 3) not in body}, "cream2")
-    c.fill({(x, y) for (x, y) in body if (x + 1, y + 1) not in body and (x, y) in body and y > 17}, "cream1")
+    # saucer: wide flat dish, a touch lopsided
+    saucer = blob([(15, 21.5), (22, 22), (28, 24), (28, 26.5), (22, 28.5), (14, 28.7), (6, 28), (2.5, 26), (3, 23.5), (8, 22)])
+    c.fill(saucer, "cream", round=2)
+    # handle (behind the cup, right)
+    outer = blob([(20, 10), (25.5, 9), (29, 13), (28.5, 18.5), (24.5, 21.5), (20, 20)])
+    inner = blob([(22, 13), (25, 12.5), (26.5, 15), (25.5, 17.5), (22.5, 17.5)])
+    c.fill(outer - inner, "cream", round=2)
+    # cup body: bowl, wider at the rim, rounded bottom
+    cup = blob([(4.5, 10.5), (13, 9.5), (21.5, 10.5), (21.5, 15.5), (19.5, 21.5), (14, 24.5), (8.5, 22), (5.5, 16.5)])
+    c.cast(cup)
+    c.fill(cup, "cream", round=3)
     # blue band
-    c.recolor(rect(0, 16, 31, 16) & body, "blue2")
-    c.recolor(rect(0, 17, 31, 17) & body, "blue1")
-    # tea surface
-    c.fill(ellipse(14.5, 11.5, 9.5, 2.4), "cream4")
-    c.fill(ellipse(14.5, 11.8, 8.2, 1.7), "brown2")
-    c.fill(rect(8, 11, 11, 11), "brown3")
-    c.fill({(6, 14), (6, 15), (7, 16)} if False else {(6, 13), (6, 14)}, "cream4")
-    # steam
+    c.recolor(rect(0, 17, 31, 17) & cup, "blue2")
+    c.recolor(rect(0, 18, 31, 18) & cup, "blue1")
+    # tea surface seen from slightly above
+    tea = blob([(5, 10.8), (13, 9.6), (21.5, 10.8), (20.5, 12.6), (13, 13.6), (6.5, 12.6)])
+    c.fill(tea, "brown", round=2)
+    # vertical glaze highlight on the left of the cup
+    c.fill({(6, y) for y in range(15, 21)}, "cream4")
+    # steam: two short wisps
     for x0 in (10, 17):
-        for i, (dx, y) in enumerate([(0, 8), (1, 7), (1, 6), (0, 5), (0, 4), (1, 3), (1, 2)]):
-            c.px(x0 + dx, y, "gray4")
-            c.px(x0 + dx + 1, y, "gray3")
+        for dx, y in [(0, 7), (1, 6), (1, 5), (0, 4), (0, 3)]:
+            c.px(x0 + dx, y, "gray3")

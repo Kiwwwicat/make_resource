@@ -1,17 +1,29 @@
-from pixelkit import ellipse, line
+from pixelkit import blob, line
 
 
 def draw(c):
-    c.fill(line(9, 19, 16, 5), "brown2")
-    c.fill(line(22, 20, 17, 5), "brown2")
-    c.fill(line(16, 4, 17, 5, 2), "brown1")
-    c.grid(18, 3, [
-        ".aab.",
-        "aabbb",
-        ".bbcc",
-        "..cc.",
-    ], {"a": "green3", "b": "green2", "c": "green1"})
-    c.fill(ellipse(9, 22.5, 6.5, 6.5), "red")
-    c.fill(ellipse(22, 23, 6.5, 6.5), "red")
-    c.fill({(6, 21), (6, 20), (7, 19), (8, 19)}, "red4")
-    c.fill({(19, 21), (19, 20), (20, 19), (21, 19)}, "red4")
+    # 줄기: 가는 부품은 고정색, 우하단 한 줄만 어둡게
+    s1 = line(10, 18, 15, 6)
+    s2 = line(22, 19, 17, 6)
+    for s in (s1, s2):
+        c.fill(s, "brown2")
+        c.fill({(x + 1, y) for (x, y) in s} - s, "brown1")
+    c.fill({(15, 5), (16, 5), (16, 6), (17, 5)}, "brown1")
+    # 잎 (줄기 위에 얹힘)
+    leaf = blob([(17, 5.5), (20, 3), (25, 3), (27.5, 5.5), (24, 8), (19.5, 8)])
+    c.cast(leaf)
+    c.fill(leaf, "green")
+    c.fill({(19, 6), (21, 5), (23, 5), (25, 5)}, "green3")
+    # 체리: 뒤(왼쪽) -> 앞(오른쪽). 아래가 묵직하고 꼭지 쪽이 살짝 들어간 형태
+    left = blob([
+        (10, 17.5), (14, 18.5), (16, 22.5), (14.5, 27), (10, 28.5),
+        (5.5, 27), (3.5, 22.5), (5.5, 18.8),
+    ])
+    c.cast(left)
+    c.fill(left, "red")
+    right = blob([
+        (22, 18.5), (26.5, 19.5), (28.8, 24), (26.5, 28), (21.5, 29),
+        (17.5, 27), (16.5, 23), (18, 19.8),
+    ])
+    c.cast(right)
+    c.fill(right, "red")

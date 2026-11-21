@@ -1,30 +1,32 @@
-from pixelkit import ellipse, rect
+from pixelkit import blob, rect
 
 
 def draw(c):
-    # handle (behind): gray ring on the right
-    ring = ellipse(23.5, 18, 5.5, 6.5) - ellipse(23.5, 18, 2.8, 3.8)
-    c.fill(ring - rect(0, 0, 21, 31), "gray2")
-    c.fill({(x, y) for (x, y) in ring if x > 21 and ((x+1, y+1) not in ring)}, "gray1")
-    # glass body
-    c.fill(rect(5, 9, 21, 28), "gray3")
-    # beer
-    beer = rect(6, 9, 20, 25)
-    c.fill(beer, "yellow2")
-    c.fill(rect(19, 9, 20, 25), "yellow1")
-    c.fill(rect(6, 12, 6, 24), "yellow3")
-    c.fill(rect(7, 14, 7, 20), "yellow3")
-    c.fill({(7, 15), (7, 16)}, "yellow4")
-    # thick glass base
-    c.fill(rect(5, 26, 21, 28), "gray2")
-    c.fill(rect(5, 26, 21, 26), "gray4")
-    c.fill(rect(20, 27, 21, 28), "gray1")
-    # bubbles
-    for p in [(11, 20), (14, 16), (12, 12), (16, 22)]:
+    # handle (behind): chunky loop on the right
+    outer = blob([(20, 11), (25, 10.5), (28.5, 14), (28.5, 20), (25.5, 24.5), (20, 24)])
+    inner = blob([(20, 14), (23.5, 14), (25.5, 16.5), (25, 20), (23, 21.5), (20, 21)])
+    handle = outer - inner - rect(0, 0, 20, 31)
+    c.fill(handle, "gray", round=2)
+    # glass body: slightly wider at the top, thick base
+    glass = blob([(4.5, 9), (21.5, 9), (21, 18), (21.5, 27.5), (19.5, 29), (6.5, 29), (4.5, 27.5), (5, 18)])
+    c.fill(glass, "gray", round=2)
+    # beer inside the glass
+    beer = blob([(6.5, 9), (19.5, 9), (19.2, 18), (19.5, 25), (18, 26.2), (8, 26.2), (6.5, 25), (6.8, 18)])
+    c.fill(beer, "yellow", round=3)
+    # glass highlight streak (left) and bubbles
+    c.fill({(5, y) for y in range(13, 24)}, "gray3")
+    c.fill({(5, y) for y in range(15, 19)}, "gray4")
+    c.fill({(7, y) for y in range(15, 23)}, "yellow3")
+    for p in [(11, 21), (14, 16), (12, 13), (16, 22)]:
         c.px(*p, "yellow3")
-    # foam overflowing the rim
-    foam = (rect(5, 8, 21, 11) | ellipse(8, 7, 3.6, 3.2) | ellipse(13, 5.5, 4, 3.6)
-            | ellipse(18, 7, 3.6, 3.2) | ellipse(21.5, 11.5, 2, 2.6) | ellipse(5.5, 11.5, 1.8, 2.4))
-    c.fill(foam, "cream3")
-    c.fill({(x, y) for (x, y) in foam if (x + 1, y + 1) not in foam or (x, y + 1) not in foam}, "cream2")
-    c.fill({(9, 6), (10, 5), (11, 4), (7, 7)}, "cream4")
+    c.fill({(x, 28) for x in range(8, 19)}, "gray1")
+    # foam: lumpy cloud over the rim with one drip running down the front
+    foam = blob([
+        (4, 11), (3.5, 7.5), (6.5, 5.5), (8.5, 3.2), (12, 4.2), (14.5, 2.5), (18, 4), (20, 5.2), (23, 7), (22.5, 11),
+        (19.5, 12.5), (15, 11.5), (10, 12.5), (6, 12.5),
+    ])
+    drip = blob([(7, 11), (10, 11), (10.5, 15), (9.5, 18.5), (7.5, 18.5), (6.5, 15)])
+    foam = foam | drip
+    c.cast(foam)
+    c.fill(foam, "cream", round=3)
+    c.fill({(8, 6), (9, 5), (10, 4)}, "cream4")

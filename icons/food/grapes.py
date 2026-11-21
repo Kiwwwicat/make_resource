@@ -1,15 +1,28 @@
-from pixelkit import ellipse, line
+from pixelkit import blob, line
+
+# 포도알 외형 템플릿 (중심 기준 오프셋): 약간 찌그러지고 아래가 묵직하다
+_A = [(0, -4.4), (3.6, -3.4), (4.8, 0.3), (3.4, 3.8), (-0.3, 4.9), (-3.8, 3.4), (-4.9, -0.4), (-3.4, -3.6)]
+_B = [(0.4, -4.7), (4, -3), (4.5, 0.8), (2.8, 4.2), (-0.8, 4.6), (-4.2, 3), (-4.6, -0.6), (-3, -3.9)]
+
+
+def berry(cx, cy, t, k=0.9):
+    return blob([(cx + dx * k, cy + dy * k) for dx, dy in t])
 
 
 def draw(c):
+    # 줄기와 잎
     c.fill(line(16, 3, 17, 8, 2), "brown2")
-    c.grid(18, 3, [
-        ".aabb..",
-        "aabbbb.",
-        "abbbbcc",
-        ".bbbccc",
-        "..bcc..",
-    ], {"a": "green3", "b": "green2", "c": "green1"})
-    for (cx, cy) in [(9, 12), (16, 11), (23, 12), (12.5, 18), (19.5, 18), (16, 24)]:
-        c.fill(ellipse(cx, cy, 4, 4), "purple")
-        c.px(int(cx) - 1, int(cy) - 2, "purple4")
+    c.fill({(17, 4), (17, 5), (17, 6), (17, 7)}, "brown1")
+    leaf = blob([(18, 5), (22, 3), (27, 4), (28, 7.5), (24, 8.5), (20, 8)])
+    c.cast(leaf)
+    c.fill(leaf, "green")
+    # 포도알: 뒤(위) -> 앞(아래) 순서, 각각 그림자를 드리운 뒤 칠한다
+    cluster = [
+        (8.5, 12.5, _B), (16, 10.5, _A), (23.5, 12.5, _A),
+        (12, 18.5, _A), (20, 19, _B),
+        (16, 25, _A),
+    ]
+    for cx, cy, t in cluster:
+        m = berry(cx, cy, t)
+        c.cast(m, depth=3)
+        c.fill(m, "purple")

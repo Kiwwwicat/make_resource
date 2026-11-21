@@ -1,20 +1,20 @@
-from pixelkit import ellipse, line, poly
+from pixelkit import blob, rect, rotate
 
 
 def draw(c):
-    # 뼈 손잡이 (왼쪽 아래)
-    shaft = line(8, 22, 15, 15, 3)
-    knobs = ellipse(5.5, 24.5, 2.5, 2.5) | ellipse(8.5, 27.5, 2.3, 2.3)
-    bone = shaft | knobs
-    c.fill(bone, "cream3")
-    c.fill({(x, y) for (x, y) in bone if (x + 1, y + 1) not in bone or ((x + 1, y) not in bone and (x, y + 1) not in bone)}, "cream2")
-    c.fill({(4, 23), (5, 22), (7, 26)}, "cream4")
-    # 살코기: 오른쪽 위가 통통하고 아래로 좁아진다
-    meat = ellipse(19.5, 11.5, 8.5, 8) | poly([(11, 13), (16, 20), (22, 17), (14, 7)]) | ellipse(15, 15, 5.5, 5.5)
-    c.fill(meat, "orange", light=2, shadow=4)
-    # 노릇한 껍질 얼룩
-    c.fill({(22, 13), (23, 13), (23, 14), (24, 14), (22, 17), (21, 18)}, "brown1")
-    c.fill({(18, 16), (19, 16), (19, 17), (13, 19)}, "brown1")
-    c.fill({(15, 8), (16, 7), (17, 7), (14, 9), (15, 9)}, "yellow3")
-    c.fill({(16, 8), (15, 8)}, "yellow4")
-    c.fill({(20, 9), (21, 9), (21, 10)}, "orange1")
+    # 뼈 손잡이: 똑바로(위가 살코기 쪽) 만든 뒤 -45도... 아래쪽이 왼쪽 아래로 가도록 돌린다
+    shaft = rect(14, 12, 17, 27)
+    knob = blob([(13.5, 26), (12.5, 28.5), (14.5, 30), (16, 28.5), (17.5, 30), (19.5, 28.5), (18.5, 26)])
+    bone = rotate(shaft | knob, 45)
+    c.fill(bone, "cream", round=2)
+    # 살코기: 위쪽(오른쪽 위)이 통통하고 뼈 쪽으로 좁아지는 물방울형
+    meat = blob([
+        (12, 16), (12.5, 9), (17.5, 4.5), (24, 5.5), (27.5, 10.5), (26.5, 16.5), (21.5, 20), (16.5, 22), (13, 21),
+    ])
+    c.cast(meat)
+    c.fill(meat, "orange", round=None)
+    # 노릇한 껍질 그늘 (우하단), 윗면에 밝은 노란 윤기
+    c.recolor({(x, y) for (x, y) in meat if (x + 2, y + 2) not in meat}, "orange1")
+    c.recolor({(23, 11), (24, 11), (24, 12), (20, 17), (21, 17)}, "brown1")
+    c.fill({(16, 8), (17, 7), (16, 9)}, "yellow3")
+    c.fill({(17, 8)}, "yellow4")

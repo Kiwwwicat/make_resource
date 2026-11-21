@@ -1,4 +1,4 @@
-from pixelkit import ellipse, poly, rect, line
+from pixelkit import blob, poly, rect, line
 
 
 def draw(c):
@@ -18,17 +18,20 @@ def draw(c):
     for x, y in [(7, 18), (14, 17), (18, 24), (9, 24)]:
         c.px(x, y, "yellow1")
     # right side face (shadow) and top
-    c.fill(side, "cream1")
-    c.fill(line(23, 14, 28, 9), "cream2")
-    c.recolor(side & rect(0, 16, 31, 19) | side & rect(0, 23, 31, 25), "yellow1")
+    c.fill(side, "yellow1")
+    c.fill(line(23, 14, 28, 9), "yellow2")
     c.recolor(side & rect(0, 22, 31, 22), "red1")
+    c.recolor(side & rect(0, 20, 31, 21), "cream1")
     c.fill(top, "cream3")
     c.fill(line(4, 14, 8, 10), "cream4")
     c.fill(line(8, 9, 28, 9), "cream4")
     c.fill(line(3, 14, 23, 14), "cream4")
-    # strawberry
-    c.fill(ellipse(16, 8, 4.5, 4), "red")
-    c.fill({(13, 7), (13, 6), (14, 5)}, "red4")
-    c.fill({(15, 8), (17, 7), (16, 10), (18, 9)}, "red1")
-    c.fill({(14, 3), (15, 4), (16, 4), (17, 3), (18, 3), (16, 3), (15, 3)}, "green2")
-    c.fill({(16, 2), (17, 2)}, "green3")
+    # strawberry: 위가 넓고 아래가 좁은 유기적 형태, 케이크 윗면에 그림자
+    berry = blob([(12, 6), (16, 4.8), (20.5, 5.8), (20, 9), (17.5, 12), (15.5, 12.4), (13, 10)])
+    c.cast(berry)
+    c.fill(berry, "red")
+    c.fill({(15, 8), (18, 7), (16, 10), (19, 9), (13, 9)}, "red1")
+    leaf = blob([(12.5, 5), (14, 3), (16.5, 2.3), (19, 3), (20, 5), (16.5, 5.5)])
+    c.fill(leaf, "green2")
+    c.fill({(13, 4), (14, 3), (15, 3)}, "green3")
+    c.fill({(18, 5), (19, 5), (19, 4)}, "green1")

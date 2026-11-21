@@ -1,19 +1,34 @@
-from pixelkit import ellipse
+from pixelkit import blob
 
 
 def draw(c):
-    body = ellipse(15.5, 16, 13, 12.5)
-    # bite: three overlapping circles scooped from the top-right
-    bite = ellipse(21, 6, 3.6, 3.6) | ellipse(25.5, 9, 3.6, 3.6) | ellipse(27, 14, 3.2, 3.2) | ellipse(24, 3, 3.6, 3.6)
-    c.fill(body - bite, "tan", shadow=2, light=2)
-    # bite edge: lighter inner crumb along the cut
-    edge = {(x, y) for (x, y) in body - bite
-            if any((x + i, y + j) in bite for i in (-1, 0, 1) for j in (-1, 0, 1))}
-    c.fill(edge, "tan3")
-    # chocolate chips (fixed colours, 2-3px lumps)
-    chips = [(8, 11), (15, 8), (11, 17), (20, 16), (7, 22), (15, 22), (22, 22), (17, 13)]
-    for x, y in chips:
-        c.fill({(x, y), (x + 1, y), (x + 2, y), (x, y + 1), (x + 1, y + 1), (x + 2, y + 1)}, "brown1")
-        c.px(x, y, "brown2")
-    # highlights top-left
-    c.fill({(6, 14), (6, 15), (7, 12), (8, 11), (10, 7), (11, 6)}, "tan4")
+    # 쿠키 본체: 살짝 찌그러진 원, 좌우 비대칭
+    outline = [
+        (15, 3.5), (22, 4.5), (27.5, 10), (28, 17), (24.5, 24), (17, 27.5),
+        (9.5, 26), (4.5, 20.5), (3.5, 13), (7.5, 6.5),
+    ]
+    # 베어 문 자국: 오른쪽 위를 파낸 곡선 (여러 둥근 홈)
+    bite = (blob([(19, 2), (23, 2.5), (25, 5.5), (22.5, 7.5), (19.5, 6)])
+            | blob([(23.5, 5), (28, 6), (29.5, 10.5), (26.5, 13), (23.5, 10)])
+            | blob([(18, 0), (31, 0), (31, 4), (24, 4), (19, 3)]))
+    body = blob(outline) - bite
+    # 두께: 한 칸 아래로 어긋난 어두운 옆면
+    side = {(x + 1, y + 2) for (x, y) in body} - body
+    c.fill(side, "tan1")
+    c.fill(body, "tan", round=3)
+    # 초콜릿 칩: 작은 덩어리 + 1px 하이라이트, 아래에 얹힌 그림자
+    chips = [
+        [(8, 11), (11, 10.5), (12, 13), (9.5, 14)],
+        [(14, 7.5), (17, 7), (18, 9.5), (15.5, 10.5)],
+        [(12.5, 17.5), (15.5, 16.8), (16.5, 19.5), (13.5, 20.5)],
+        [(19.5, 15), (22.5, 14.5), (23.5, 17.5), (20.5, 18.5)],
+        [(7.5, 21), (10.5, 20.5), (11.5, 23), (8.5, 24)],
+        [(17, 22.5), (20, 22), (21, 24.5), (18, 25.5)],
+    ]
+    for pts in chips:
+        m = blob(pts)
+        c.cast(m)
+        c.fill(m, "brown1")
+        c.px(*min(m, key=lambda p: (p[1] + p[0], p[1])), "brown3")
+    # 하이라이트 (좌상단)
+    c.fill({(6, 14), (6, 15), (7, 12), (8, 9), (10, 6), (11, 5)}, "tan4")

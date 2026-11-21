@@ -1,20 +1,15 @@
-import math
-from pixelkit import ellipse
+from pixelkit import blob, rotate
 
 
 def draw(c):
-    a = math.radians(-30)
-    ca, sa = math.cos(a), math.sin(a)
-    body = set()
-    for y in range(32):
-        for x in range(32):
-            u = (x - 15.5) * ca + (y - 15.5) * sa
-            v = -(x - 15.5) * sa + (y - 15.5) * ca
-            if abs(u) < 11.5 and abs(v) <= 9.5 * (1 - (abs(u) / 11.5) ** 2) ** 0.5:
-                body.add((x, y))
-    body |= ellipse(27, 9, 2.2, 2.2) | ellipse(4, 22, 2.2, 2.2)
-    c.fill(body, "yellow", light=2, shadow=2)
-    c.fill({(9, 15), (9, 16), (10, 13), (11, 12), (13, 11), (10, 14)}, "yellow4")
-    # 껍질 질감 점
-    for (x, y) in [(15, 17), (19, 14), (12, 20), (21, 19)]:
-        c.px(x, y, "yellow1")
+    # 똑바로(가로로) 만든 뒤 돌린다: 양 끝에 작은 꼭지, 아래쪽이 살짝 더 묵직하다
+    lemon = blob([
+        (1.5, 15), (4.2, 13.6), (7.5, 10), (12, 7.6), (17.5, 7.2), (22.5, 9.5), (26, 12.6),
+        (30, 14.8), (27, 17.3), (23.5, 22), (17, 24.6), (10.5, 23.6), (6, 19.5), (3.5, 16.8),
+    ])
+    body = rotate(lemon, -28)
+    c.fill(body, "yellow")
+    # 껍질의 오돌토돌한 질감 (소수)
+    for (x, y) in [(14, 18), (20, 16), (17, 21)]:
+        if (x, y) in body:
+            c.px(x, y, "yellow1")
