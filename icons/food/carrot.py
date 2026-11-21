@@ -1,26 +1,22 @@
-from pixelkit import blob, despike, line, rotate
-
-TILT = 45  # 똑바로 세워 만든 뒤 오른쪽으로 45도 눕힌다
+from pixelkit import blob, line
 
 
 def draw(c):
-    # 잎 (뒤): 위로 뻗은 세 갈래, 가운데가 가장 길고 좌우가 약간 다르다
-    leaves = [
-        blob([(14.5, 11), (11, 7.5), (9.5, 3), (13, 4.5), (15.5, 8)]),
-        blob([(15, 11), (14.5, 6), (16.5, 1), (18.5, 5.5), (18, 11)]),
-        blob([(17.5, 11), (19.5, 7), (23.5, 4), (23.5, 8), (20.5, 11.5)]),
-    ]
-    foliage = despike(rotate(leaves[0] | leaves[1] | leaves[2], TILT, 12, 14))
-    # 당근 몸통: 어깨가 넓고 끝이 가늘게 휘어 내려간다 (아래가 약간 왼쪽으로 쏠림)
-    root = blob([
-        (15.5, 10.3), (19, 10.8), (20.8, 13.5), (20.2, 18), (18.4, 23), (16.4, 27),
-        (14.6, 30), (13.2, 27), (11.8, 22.5), (10.6, 17.5), (10.8, 13), (12.5, 10.8),
-    ])
-    body = despike(rotate(root, TILT, 12, 14))
-    c.fill(foliage, "green")
+    # leaves first (behind), three fronds fanning to the upper right
+    fa = blob([(19, 9), (17, 6), (17.5, 2.5), (20, 5.5), (21.5, 8.5)])
+    fb = blob([(21.5, 8.5), (22.5, 5.5), (28.5, 2.5), (26, 7.5), (24, 9.5)])
+    fc = blob([(24, 9), (26, 7.5), (29.5, 8.5), (27.5, 11), (24.5, 12)])
+    leaves = fa | fb | fc
+    c.fill(leaves, "green")
+    c.recolor(line(21, 8, 21, 6), "green1")
+    c.recolor(line(25, 9, 26, 7), "green1")
+    # root along the diagonal: thick shoulder at upper right, straight taper to lower-left tip
+    body = blob([(4, 27), (5.3, 24.3), (8.4, 19.4), (11.7, 14.7), (15, 10), (18.8, 6.5),
+                 (22.8, 6.8), (25.2, 12.2), (21, 16), (16.3, 19.3), (11.6, 22.6), (6.7, 25.7)])
     c.cast(body)
     c.fill(body, "orange")
-    # 가로 주름 (똑바로 그린 뒤 같이 회전)
-    ridges = rotate(line(11, 15, 14, 16) | line(17, 18, 20, 17) | line(12, 21, 15, 22)
-                    | line(15, 25, 17, 25), TILT, 12, 14)
-    c.recolor(ridges & body, "orange1")
+    # curved ridge marks across the body
+    for pts in (((14, 12), (16, 12), (18, 13), (19, 15)), ((11, 16), (13, 16), (15, 17), (16, 19)),
+                ((8, 20), (10, 20), (12, 21)), ((19, 9), (21, 9), (23, 10), (24, 12))):
+        for a, b in zip(pts, pts[1:]):
+            c.recolor(line(*a, *b) & body, "orange1")

@@ -1,27 +1,45 @@
-from pixelkit import blob, rect, line
+from pixelkit import ellipse, poly, rect
 
 
 def draw(c):
-    # saucer: wide flat dish, a touch lopsided
-    saucer = blob([(15, 21.5), (22, 22), (28, 24), (28, 26.5), (22, 28.5), (14, 28.7), (6, 28), (2.5, 26), (3, 23.5), (8, 22)])
-    c.fill(saucer, "cream", round=2)
-    # handle (behind the cup, right)
-    outer = blob([(20, 10), (25.5, 9), (29, 13), (28.5, 18.5), (24.5, 21.5), (20, 20)])
-    inner = blob([(22, 13), (25, 12.5), (26.5, 15), (25.5, 17.5), (22.5, 17.5)])
-    c.fill(outer - inner, "cream", round=2)
-    # cup body: bowl, wider at the rim, rounded bottom
-    cup = blob([(4.5, 10.5), (13, 9.5), (21.5, 10.5), (21.5, 15.5), (19.5, 21.5), (14, 24.5), (8.5, 22), (5.5, 16.5)])
+    # saucer
+    saucer = ellipse(15.5, 24.5, 13, 2.5)
+    c.fill(saucer, "cream3")
+    c.fill({(x, y) for (x, y) in saucer if (x, y + 1) not in saucer or (x + 1, y) not in saucer}, "cream2")
+    c.fill({(x, y) for (x, y) in saucer if ((x, y - 1) not in saucer and x < 17) or ((x - 1, y) not in saucer and y < 25)}, "cream4")
+
+    # handle (behind cup, right)
+    outer = ellipse(25.5, 16, 3.5, 4.5)
+    inner = ellipse(26, 16, 1.5, 2.5)
+    ring = outer - inner
+    c.fill(ring, "cream3")
+    c.fill({(x, y) for (x, y) in ring if (x, y + 1) not in ring or (x + 1, y) not in ring}, "cream2")
+
+    # cup silhouette
+    body = poly([(8, 11), (23, 11), (22, 15), (20, 19), (18, 21), (13, 21), (11, 19), (9, 15)])
+    cup = body | ellipse(15.5, 11, 8, 2.5)
     c.cast(cup)
-    c.fill(cup, "cream", round=3)
+    c.fill(cup, "cream3")
+    rows = {}
+    for (x, y) in cup:
+        lo, hi = rows.get(y, (99, -99))
+        rows[y] = (min(lo, x), max(hi, x))
+    c.fill({(x, y) for (x, y) in cup if y >= 12 and x > rows[y][1] - 3}, "cream2")
+    c.fill({(x, y) for (x, y) in cup if y == 21}, "cream2")
+    c.fill({(rows[y][0] + 2, y) for y in range(13, 20)}, "cream4")
     # blue band
-    c.recolor(rect(0, 17, 31, 17) & cup, "blue2")
-    c.recolor(rect(0, 18, 31, 18) & cup, "blue1")
-    # tea surface seen from slightly above
-    tea = blob([(5, 10.8), (13, 9.6), (21.5, 10.8), (20.5, 12.6), (13, 13.6), (6.5, 12.6)])
-    c.fill(tea, "brown", round=2)
-    # vertical glaze highlight on the left of the cup
-    c.fill({(6, y) for y in range(15, 21)}, "cream4")
-    # steam: two short wisps
-    for x0 in (10, 17):
-        for dx, y in [(0, 7), (1, 6), (1, 5), (0, 4), (0, 3)]:
-            c.px(x0 + dx, y, "gray3")
+    band = {(x, y) for (x, y) in cup if y == 15}
+    c.fill(band, "blue2")
+    c.fill({(x, y) for (x, y) in band if x > rows[y][1] - 3}, "blue1")
+    # tea opening
+    op = ellipse(15.5, 11, 7, 2.5)
+    back = {(x, y) for (x, y) in op if (x, y - 1) not in op}
+    tea = op - back
+    c.fill(tea, "brown2")
+    c.fill(back, "cream2")
+    c.fill({(x, y) for (x, y) in tea if (x - 1, y) not in tea or (x, y - 1) not in tea} - {(x, y) for (x, y) in tea if x > 12 or y > 11}, "brown3")
+
+    # steam
+    for x0 in (11, 19):
+        for dx, dy in [(1, 0), (0, 1), (0, 2), (1, 3)]:
+            c.px(x0 + dx, 3 + dy, "gray3")

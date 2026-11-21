@@ -1,44 +1,46 @@
-from pixelkit import blob, line
+import math
+from pixelkit import ellipse, rect
 
 
 def draw(c):
-    # 파이 틀의 옆면: 윗면보다 아래로 내려온 두께
-    side = blob([
-        (3, 15), (7, 8.5), (15, 6.5), (24, 8), (28.5, 14), (27, 22),
-        (21, 26.5), (13, 27), (6, 23.5),
-    ])
-    c.fill(side, "tan1")
-    c.fill({(x, y) for (x, y) in side if x < 12}, "tan2")
-    # 윗면 크러스트 테두리 (살짝 비대칭)
-    top = blob([
-        (3, 13.5), (7, 7), (15, 4.5), (24, 6), (28.5, 12), (27, 18),
-        (21, 21.5), (13, 22), (6, 19),
-    ])
+    N4 = ((1, 0), (-1, 0), (0, 1), (0, -1))
+    # (a) side wall / tin: lower part, shifted down
+    wall = ellipse(15.5, 16.5, 13, 6.5)
+    top = ellipse(15.5, 13, 13, 6.5)
+    c.fill(wall, "tan1")
+    vis = wall - top
+    c.fill({(x, y) for (x, y) in vis if (x, y - 1) in top}, "tan2")
+    # (b) top crust
     c.cast(top)
     c.fill(top, "tan", round=3)
-    # 속 (빨간 필링)
-    filling = blob([
-        (6.5, 13.5), (9.5, 8.8), (15.5, 7.4), (22.5, 8.6), (25.5, 13), (24, 17.4),
-        (19.5, 19.4), (13, 19.5), (8, 17.5),
-    ])
-    c.fill(filling, "red", round=3)
-    # 크림프(주름) 테두리: 바깥 가장자리 안쪽 1px 줄에 2px 간격의 홈, 안쪽 턱에 밝은/어두운 선
-    ring = top - filling
-    edge = {(x, y) for (x, y) in ring
-            if any(q not in top for q in ((x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1)))}
-    inner = ring - edge
-    pits = {(x, y) for (x, y) in inner
-            if any(q in edge for q in ((x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1)))
-            and ((x + y) // 2) % 2 == 0}
-    c.fill(pits, "tan3")
-    groove = {(x, y) for (x, y) in ring
-              if any(q in filling for q in ((x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1)))}
-    c.fill(groove, "tan2")
-    c.fill({(x, y) for (x, y) in groove if (x + 1, y + 1) in filling or (x, y + 1) in filling}, "tan1")
-    # 넓은 반죽 띠 3줄 (비스듬, 3px 폭)
-    for ox in (-4, 3, 10):
-        strip = line(ox + 4, 21, ox + 14, 7, 3) & filling
-        c.cast(strip)
-        c.fill(strip, "tan3")
-        c.fill({(x, y) for (x, y) in strip if (x + 1, y) not in strip or (x, y + 1) not in strip}, "tan2")
-        c.fill({(x, y) for (x, y) in strip if (x - 1, y) not in strip and (x, y - 1) not in strip}, "tan4")
+    # (c) recessed filling opening
+    op = ellipse(15.5, 13, 9.5, 4.5)
+    c.fill(op, "red2")
+    c.fill({(x, y) for (x, y) in op if (x - 1, y) not in op or (x, y - 1) not in op}, "red1")
+    c.fill({(x, y) for (x, y) in op if (x - 1, y - 1) not in op and (x - 1, y) in op and (x, y - 1) in op}, "red1")
+    for p in ((17, 15), (12, 16), (21, 14)):
+        if p in op:
+            c.px(p[0], p[1], "red3")
+    # (d) lattice of straight strips
+    strips = set()
+    for x in (9, 14, 19):
+        strips |= rect(x, 0, x + 1, 31)
+    for y in (10, 14):
+        strips |= rect(0, y, 31, y + 1)
+    strips &= op
+    c.cast(strips)
+    c.fill(strips, "tan3")
+    c.fill({(x, y) for (x, y) in strips if (x + 1, y) not in strips or (x, y + 1) not in strips}, "tan2")
+    # (e) crimped rim along outer crust ring
+    ring = [(x, y) for (x, y) in top if any((x + dx, y + dy) not in top for dx, dy in N4)]
+    ring.sort(key=lambda p: math.atan2(p[1] - 13, (p[0] - 15.5) * 0.5))
+    n = len(ring)
+    for i, (x, y) in enumerate(ring):
+        k = (i * 22 // n) % 2
+        nx, ny = (x - 15.5) / 13, (y - 13) / 6.5
+        lit = (-nx - ny) > 0
+        if lit:
+            col = "tan3" if k == 0 else "tan2"
+        else:
+            col = "tan2" if k == 0 else "tan1"
+        c.px(x, y, col)
