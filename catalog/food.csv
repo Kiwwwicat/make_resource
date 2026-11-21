@@ -1,25 +1,33 @@
-id,name_ko,name_ja,name_en,brief
-apple,사과,りんご,Apple,빨간 사과. 갈색 꼭지와 초록 잎 하나
-strawberry,딸기,いちご,Strawberry,빨간 딸기. 초록 꼭지와 노란 씨
-grapes,포도,ぶどう,Grapes,보라색 포도송이. 갈색 줄기와 잎
-cherry,체리,さくらんぼ,Cherry,줄기가 이어진 체리 두 알
-lemon,레몬,レモン,Lemon,노란 레몬 한 개 (비스듬히)
-carrot,당근,にんじん,Carrot,대각선으로 놓인 당근. 초록 잎
-mushroom,버섯,きのこ,Mushroom,빨간 갓에 흰 점이 있는 버섯
-pumpkin,호박,かぼちゃ,Pumpkin,주황색 호박. 세로 골과 꼭지
-bread,빵,パン,Bread,칼집이 난 둥근 시골빵
-cheese,치즈,チーズ,Cheese,구멍 뚫린 노란 치즈 조각 (쐐기형)
-meat_on_bone,뼈 붙은 고기,骨付き肉,Meat on Bone,만화 고기. 양쪽으로 뼈가 나온 구운 고기
-chicken_leg,닭다리,チキンレッグ,Chicken Leg,구운 닭다리. 뼈 손잡이
-grilled_fish,생선구이,焼き魚,Grilled Fish,통째로 구운 생선. 대각선 배치
-fried_egg,달걀프라이,目玉焼き,Fried Egg,흰자 위에 노른자 하나
-stew,스튜,シチュー,Stew,나무 그릇에 담긴 스튜. 건더기와 김
-onigiri,주먹밥,おにぎり,Onigiri,삼각 주먹밥과 김
-pie,파이,パイ,Pie,격자무늬 파이 한 판 (비스듬한 시점)
-cake_slice,조각 케이크,ショートケーキ,Cake Slice,딸기 올린 쇼트케이크 조각
-cookie,쿠키,クッキー,Cookie,초코칩 쿠키. 한 입 베어문 자국
-donut,도넛,ドーナツ,Donut,분홍 글레이즈 도넛과 스프링클
-candy,사탕,キャンディ,Candy,양쪽을 비튼 포장 사탕
-wine_bottle,와인병,ワインボトル,Wine Bottle,짙은 초록 와인병. 크림색 라벨
-beer_mug,맥주잔,ビールジョッキ,Beer Mug,거품이 넘치는 나무/유리 맥주잔
-tea_cup,찻잔,ティーカップ,Tea Cup,받침 접시 위의 찻잔. 김
+id,name_ko,name_ja,name_en,brief,prompt_en
+apple,사과,りんご,Apple,빨간 사과. 갈색 꼭지와 초록 잎 하나,a red apple with a brown stem and one green leaf
+strawberry,딸기,いちご,Strawberry,빨간 딸기. 초록 꼭지와 노란 씨,a red strawberry with yellow seeds and a green leafy calyx
+grapes,포도,ぶどう,Grapes,보라색 포도송이. 갈색 줄기와 잎,a bunch of purple grapes with a brown stem and one green leaf
+cherry,체리,さくらんぼ,Cherry,줄기가 이어진 체리 두 알,two red cherries joined by thin green stems with one leaf
+lemon,레몬,レモン,Lemon,노란 레몬 한 개 (비스듬히),a whole yellow lemon with one small green leaf
+carrot,당근,にんじん,Carrot,대각선으로 놓인 당근. 초록 잎,"an orange carrot with a green leafy top, placed diagonally"
+mushroom,버섯,きのこ,Mushroom,빨간 갓에 흰 점이 있는 버섯,a mushroom with a red cap with white spots and a cream stem
+pumpkin,호박,かぼちゃ,Pumpkin,주황색 호박. 세로 골과 꼭지,a round orange pumpkin with vertical ribs and a short stem
+bread,빵,パン,Bread,칼집이 난 둥근 시골빵,a round rustic bread loaf with three scored slashes
+cheese,치즈,チーズ,Cheese,구멍 뚫린 노란 치즈 조각 (쐐기형),a wedge of yellow cheese with round holes
+meat_on_bone,뼈 붙은 고기,骨付き肉,Meat on Bone,만화 고기. 양쪽으로 뼈가 나온 구운 고기,"a big chunk of roasted brown meat with a white bone sticking out of both ends, placed diagonally"
+chicken_leg,닭다리,チキンレッグ,Chicken Leg,구운 닭다리. 뼈 손잡이,"a roasted golden chicken drumstick with a white bone handle, placed diagonally"
+grilled_fish,생선구이,焼き魚,Grilled Fish,통째로 구운 생선. 대각선 배치,"a whole grilled fish with dark grill marks, placed diagonally"
+fried_egg,달걀프라이,目玉焼き,Fried Egg,흰자 위에 노른자 하나,"a fried egg seen from above, white with one round yellow yolk"
+stew,스튜,シチュー,Stew,나무 그릇에 담긴 스튜. 건더기와 김,a wooden bowl of orange-brown stew with chunks and two small wisps of steam
+onigiri,주먹밥,おにぎり,Onigiri,삼각 주먹밥과 김,"an onigiri rice ball, a rounded white triangle with a dark nori strip at the bottom"
+pie,파이,パイ,Pie,격자무늬 파이 한 판 (비스듬한 시점),a whole round pie with a golden lattice crust and red berry filling
+cake_slice,조각 케이크,ショートケーキ,Cake Slice,딸기 올린 쇼트케이크 조각,a slice of strawberry shortcake with one strawberry on top
+cookie,쿠키,クッキー,Cookie,초코칩 쿠키. 한 입 베어문 자국,a round chocolate chip cookie with one bite taken out
+donut,도넛,ドーナツ,Donut,분홍 글레이즈 도넛과 스프링클,a ring donut with pink icing and colourful sprinkles
+candy,사탕,キャンディ,Candy,양쪽을 비튼 포장 사탕,a wrapped red-and-white striped hard candy with twisted wrapper ends
+wine_bottle,와인병,ワインボトル,Wine Bottle,짙은 초록 와인병. 크림색 라벨,"a dark green wine bottle with a blank cream label and a red cap, placed diagonally"
+beer_mug,맥주잔,ビールジョッキ,Beer Mug,거품이 넘치는 나무/유리 맥주잔,"a wooden tavern beer mug with metal bands, a handle and white foam"
+tea_cup,찻잔,ティーカップ,Tea Cup,받침 접시 위의 찻잔. 김,"a white porcelain tea cup with a blue band on a saucer, with two wisps of steam"
+banana,바나나,バナナ,Banana,노란 바나나,a yellow banana
+pear,배,洋なし,Pear,초록 서양배,a green pear with a brown stem
+tomato,토마토,トマト,Tomato,빨간 토마토,a red tomato with a green stem
+corn,옥수수,とうもろこし,Corn,껍질이 붙은 옥수수,a yellow corn cob with green husk
+croissant,크루아상,クロワッサン,Croissant,크루아상,a golden croissant
+sausage,소시지,ソーセージ,Sausage,줄줄이 소시지,a link of three red-brown sausages
+honey_jar,꿀단지,はちみつ,Honey Jar,천 뚜껑을 씌운 꿀단지,a glass jar of golden honey with a cloth lid
+milk_bottle,우유병,ミルク,Milk Bottle,우유가 든 유리병,a glass bottle of white milk

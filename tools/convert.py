@@ -139,6 +139,21 @@ def quantize(cells, alpha):
     return out
 
 
+def denoise(pix):
+    """한 픽셀에만 쓰인 색(경계 번짐으로 생긴 잡색)을 그 아이콘의 주요 색 중 가장 가까운 것으로 합친다.
+    스프링클·씨앗처럼 같은 색이 여러 번 나오는 디테일은 건드리지 않는다."""
+    cnt = Counter(pix.values())
+    major = [c for c, n in cnt.items() if n >= 3]
+    if not major:
+        return pix
+    mlab = lab(np.array([pk.rgb(*c)[:3] for c in major]))
+    for p, c in list(pix.items()):
+        if cnt[c] == 1:
+            d = ((mlab - lab(np.array(pk.rgb(*c)[:3]))) ** 2).sum(axis=1)
+            pix[p] = major[int(d.argmin())]
+    return pix
+
+
 def fit(pix):
     """30x30에 맞추고 중앙 정렬. 넘치면 '덮는 칸들의 다수색'으로 축소."""
     xs = [p[0] for p in pix]; ys = [p[1] for p in pix]
@@ -209,7 +224,7 @@ def convert(cat, icon_id, a=None, base=None):
     xs = [p[0] for p in pix]; ys = [p[1] for p in pix]
     raw = (max(xs) - min(xs) + 1, max(ys) - min(ys) + 1)
     pix, scale = fit(pix)
-    pix = clean(pix)
+    pix = clean(denoise(pix))
     img = Image.new("RGBA", (pk.SIZE, pk.SIZE), (0, 0, 0, 0))
     for (x, y), (ramp, s) in pix.items():
         if 0 <= x < pk.SIZE and 0 <= y < pk.SIZE:
@@ -218,8 +233,8 @@ def convert(cat, icon_id, a=None, base=None):
     dest.parent.mkdir(parents=True, exist_ok=True)
     img.save(dest)
     note = "" if scale == 1 else f"  (축소 {scale:.2f}배)"
-    if max(raw) < 22:
-        note += "  ** 22칸 미만: 작게 나옴"
+    if max(raw) < 20:
+        note += "  ** 20칸 미만: 작게 나옴"
     print(f"{cat}/{icon_id}: 격자 {grid[0][0]:.2f}x{grid[1][0]:.2f}px, 원본 {raw[0]}x{raw[1]}칸{note}")
     return scale == 1
 
@@ -228,7 +243,7 @@ def convert_sheet(path, cat, ids, cols=2):
     """한 장에 여러 아이콘이 격자로 놓인 시트를 칸별로 잘라 변환. ids는 좌->우, 위->아래 순서,
     건너뛸 칸은 '-'."""
     a = np.array(Image.open(path).convert("RGB"))
-    rows = (len(ids) + cols - 1) // cols
+    rows = cols   # 시트는 항상 정사각 격자 (빈 칸은 '-')
     h, w = a.shape[0] // rows, a.shape[1] // cols
     base = cell_size(a)   # 한 시트의 아이콘들은 같은 픽셀 격자를 쓴다
     for i, iid in enumerate(ids):

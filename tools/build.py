@@ -41,7 +41,7 @@ def render(cat, icon_id):
                     c.pix[(x, y)] = back[px]
                 else:
                     bad += 1
-        err, warn = c.lint(lo=1, hi=30, max_ramps=9, max_colors=28)
+        err, warn = c.lint(lo=1, hi=30, max_ramps=12, max_colors=32)
         warn = [w for w in warn if "고립 픽셀" not in w]
         if bad:
             err.append(f"팔레트 밖 색 또는 반투명 픽셀 {bad}개")

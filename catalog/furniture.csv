@@ -1,0 +1,33 @@
+id,name_ko,name_ja,name_en,brief,prompt_en
+chair,의자,椅子,Chair,나무 의자,a simple wooden chair seen from a three-quarter view
+stool,스툴,スツール,Stool,둥근 나무 스툴,a round three-legged wooden stool
+armchair,안락의자,アームチェア,Armchair,붉은 천 안락의자,a red upholstered armchair with wooden legs
+sofa,소파,ソファ,Sofa,초록 2인용 소파,a green two-seat sofa with wooden legs
+bench,벤치,ベンチ,Bench,긴 나무 벤치,a long wooden bench
+throne,왕좌,玉座,Throne,금장식 붉은 왕좌,a royal throne with gold trim and red cushion
+round_table,원탁,丸テーブル,Round Table,둥근 나무 탁자,a round wooden table seen from a three-quarter view
+long_table,긴 탁자,長テーブル,Long Table,직사각 나무 식탁,a long rectangular wooden dining table seen from a three-quarter view
+desk,책상,机,Desk,서랍 달린 책상,a wooden writing desk with drawers
+bed,침대,ベッド,Bed,흰 베개와 파란 이불의 침대,"a wooden bed with a white pillow and a blue blanket, seen from a three-quarter view"
+bookshelf,책장,本棚,Bookshelf,책이 가득한 책장,a tall wooden bookshelf full of colourful books
+wardrobe,옷장,ワードローブ,Wardrobe,두 문 옷장,a tall wooden wardrobe with two doors
+drawer,서랍장,チェスト,Chest of Drawers,3단 서랍장,a wooden chest of three drawers with round knobs
+cabinet,찬장,食器棚,Cabinet,유리문 찬장,a wooden cabinet with glass doors showing dishes
+treasure_chest,보물상자,宝箱,Treasure Chest,금테 두른 보물상자,a closed wooden treasure chest with gold bands and a lock
+barrel,나무통,樽,Barrel,쇠테 두른 나무통,a wooden barrel with metal hoops
+crate,나무 상자,木箱,Crate,나무 화물 상자,a wooden shipping crate with crossed planks
+door,문,ドア,Door,아치형 나무 문,an arched wooden door with iron hinges and a ring handle
+window,창문,窓,Window,십자 창살 창문,a wooden framed window with four blue glass panes
+fireplace,벽난로,暖炉,Fireplace,불이 타는 돌 벽난로,a stone fireplace with a burning fire
+cauldron,가마솥,大釜,Cauldron,초록 액체가 끓는 검은 솥,a black iron cauldron with bubbling green liquid
+candelabra,촛대,燭台,Candelabra,세 갈래 금 촛대,a golden three-armed candelabra with lit candles
+wall_torch,벽 횃불,壁掛け松明,Wall Torch,벽걸이 횃불,a wall-mounted burning torch in an iron bracket
+mirror,거울,鏡,Mirror,금테 전신 거울,a standing oval mirror with a golden frame
+rug,러그,ラグ,Rug,무늬가 있는 붉은 러그,"a red patterned rug with gold fringe, seen from a three-quarter top view"
+grandfather_clock,괘종시계,柱時計,Grandfather Clock,추가 달린 괘종시계,a tall wooden grandfather clock with a pendulum
+piano,피아노,ピアノ,Piano,업라이트 피아노,an upright wooden piano with black and white keys
+bathtub,욕조,浴槽,Bathtub,물이 담긴 나무 욕조,a wooden bathtub filled with water
+coat_rack,옷걸이,コートラック,Coat Rack,모자가 걸린 스탠드 옷걸이,a standing wooden coat rack with a hat hanging on it
+weapon_rack,무기 거치대,武器ラック,Weapon Rack,검과 창이 걸린 거치대,a wooden weapon rack holding a sword and a spear
+ladder,사다리,はしご,Ladder,나무 사다리,"a wooden ladder, placed slightly diagonally"
+painting,액자 그림,絵画,Painting,금테 풍경화,a landscape painting in a golden frame

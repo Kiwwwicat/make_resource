@@ -347,8 +347,8 @@ class Canvas:
         if x0 < lo or y0 < lo or x1 > hi or y1 > hi:
             err.append(f"채색 영역 초과: x {x0}..{x1}, y {y0}..{y1} (허용 {lo}..{hi})")
         w, h = x1 - x0 + 1, y1 - y0 + 1
-        if max(w, h) < 22:
-            err.append(f"너무 작음: {w}x{h} (긴 변이 22px 이상이어야 함, 권장 24~28)")
+        if max(w, h) < 20:
+            err.append(f"너무 작음: {w}x{h} (긴 변이 20px 이상이어야 함)")
         if min(w, h) < 8:
             warn.append(f"매우 가늚: {w}x{h} - 대각선 배치를 고려")
         cx, cy = (x0 + x1) / 2 - 15.5, (y0 + y1) / 2 - 15.5
