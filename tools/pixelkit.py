@@ -23,7 +23,7 @@ PALETTE = {
     "pink":   ["5e2147", "a83a6b", "dd6090", "f394b0", "fdc9d2"],
     "brown":  ["33201f", "5c3829", "8a5634", "b57b46", "d9a868"],
     "tan":    ["5a3a26", "9a6a3c", "c99755", "e6c17e", "f6e0ab"],
-    "cream":  ["5f4a44", "a8907c", "d8c7a8", "f2e8cf", "fffaf0"],
+    "cream":  ["5f4a44", "b8a999", "d8c7a8", "f2e8cf", "fffaf0"],
     "gray":   ["23232e", "4a4c5c", "7c8090", "b0b6c2", "e2e7ee"],
 }
 
