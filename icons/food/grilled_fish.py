@@ -31,7 +31,7 @@ def draw(c):
     c.fill(body, "orange", light=2, shadow=3)
     # 배 (왼쪽 아래) 밝은 살
     belly = {(x, y) for (x, y) in body if (-(x - CX) + (y - CY)) * 0.707 > 3.2}
-    c.recolor(belly, "yellow3")
+    c.recolor(belly, "orange3")
     # 석쇠 자국: 몸통을 가로지르는 짧은 줄
     for u in (-1, 3, 7):
         px, py = CX + u * 0.707, CY + u * 0.707
