@@ -1,25 +1,28 @@
-from pixelkit import blob, rect, rotate
+from pixelkit import blob, poly, line
 
 
 def draw(c):
-    # 똑바로(머리 위, 꼬리 아래) 만든 뒤 마지막에 -45도 돌린다. 등은 오른쪽, 배는 왼쪽.
-    R = lambda m: rotate(m, -45, 12, 17.5)
-    body = blob([(15, 2.5), (19.5, 4), (23, 9), (24, 15), (21.5, 20.5), (18, 24), (14, 24), (10.5, 20.5), (8, 15),
-                 (8.5, 9), (11, 4.5)])
-    tail = blob([(13.5, 21), (17.5, 21), (23, 28.5), (22.5, 30.5), (16, 27), (9.5, 30.5), (9, 28)])
-    dorsal = blob([(20, 9), (24.5, 10), (26, 16), (21, 15.5)])
-    c.fill(R(tail), "orange", round=2)
-    c.fill(R(dorsal), "orange", round=2)
-    bodyR = R(body)
-    c.cast(bodyR)
-    c.fill(bodyR, "orange")
-    # 배: 왼쪽 아래 밝은 살색
-    belly = {(x, y) for (x, y) in body if x <= 10.5 and y >= 11}
-    c.recolor(R(belly), "tan3")
-    # 석쇠 자국: 몸통 안쪽에 짧게 2줄
-    for y in (12, 17):
-        c.recolor(R({(x, y) for x in range(12, 21)} & body), "orange1")
-    # 아가미 선, 눈
-    c.recolor(R({(11, 7), (11, 8), (12, 9), (12, 10)}), "orange1")
-    c.fill(R({(12, 5), (13, 5), (12, 6), (13, 6)}), "cream4")
-    c.recolor(R({(12, 6)}), "gray0")
+    # whole fish, side view, head at left
+    tail = poly([(21, 14), (28, 8), (25, 16), (28, 24), (21, 18)])
+    dorsal = poly([(10, 12), (13, 7), (18, 12)])
+    body = blob([(3, 16), (6, 13), (10, 11), (15, 11), (19.5, 13.5), (22, 15), (22, 17.5),
+                 (19.5, 18.5), (15, 21), (10, 21.5), (6, 19.5)])
+    c.fill(tail, "orange2")
+    c.fill({p for p in tail if p[1] >= 17}, "orange1")
+    c.fill(dorsal, "orange2")
+    c.recolor({p for p in dorsal if p[0] >= 15}, "orange1")
+    c.cast(body)
+    c.fill(body, "orange")
+    # belly
+    belly = {p for p in body if p[1] >= 18}
+    c.recolor(belly, "tan3")
+    c.recolor({p for p in belly if p[1] >= 20}, "tan2")
+    # pectoral fin
+    c.fill(poly([(12, 17), (14, 17), (11, 19)]), "orange1")
+    # grill marks
+    for x in (11, 15, 19):
+        c.recolor(line(x, 12, x + 2, 16) & body, "brown1")
+    # gill, eye
+    c.recolor({(8, 14), (9, 15), (9, 16)}, "orange1")
+    c.px(6, 15, "brown0")
+    c.px(7, 15, "cream4")
