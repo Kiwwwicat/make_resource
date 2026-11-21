@@ -1,28 +1,26 @@
-from pixelkit import blob, line
+from pixelkit import blob, poly, line, rect
 
 
 def draw(c):
-    # wrapper twists (behind body): ragged fans, slightly different left/right
-    left = blob([(9, 14), (6.5, 10.5), (3, 7.5), (2.5, 11.5), (4.5, 15.5), (2.5, 19.5), (3, 24), (7, 20.5), (9, 18)])
-    right = blob([(22, 14), (25, 10), (28.5, 8.5), (29, 12.5), (26.5, 15.5), (28.5, 20), (27, 23.5), (24, 20.5), (22, 18)])
-    c.fill(left, "teal", round=2)
-    c.fill(right, "teal", round=2)
-    # crease lines in the wrapper
-    c.line(8, 14, 4, 10, "teal1")
-    c.line(8, 17, 4, 21, "teal1")
-    c.line(23, 14, 27, 10, "teal3")
-    c.line(23, 17, 27, 21, "teal1")
-    # body: plump, asymmetric, heavier at the bottom right
-    body = blob([
-        (14.5, 6), (20, 6.5), (24.5, 10.5), (25, 16), (23, 22), (17.5, 25), (11, 24.5),
-        (6.5, 20.5), (6, 14), (9, 8.5),
-    ])
-    c.cast(body)
-    c.fill(body, "red")
-    # diagonal cream stripes, kept on top of the shaded body
+    # wrapper ends: tight knot at the ball, fan widening to the canvas edge, zig-zag outer edge
+    left = poly([(8, 15), (2, 10), (4, 12.5), (2, 15), (4, 17.5), (2, 20), (8, 16)]) | rect(7, 15, 8, 16)
+    right = poly([(23, 15), (29, 9), (27, 12), (29, 14.5), (27, 17.5), (29, 21), (23, 16)]) | rect(23, 15, 24, 16)
+    c.fill(left, "teal2")
+    c.fill(right, "teal2")
+    # creases radiating from the knot
+    c.recolor(line(7, 15, 3, 11) | line(7, 15, 4, 14), "teal1")
+    c.recolor(line(7, 16, 3, 17) | line(6, 16, 3, 19), "teal3")
+    c.recolor(line(7, 16, 3, 20), "teal1")
+    c.recolor(line(24, 15, 28, 10) | line(24, 15, 27, 14), "teal3")
+    c.recolor(line(24, 16, 28, 16), "teal1")
+    c.recolor(line(24, 16, 28, 21) | line(25, 17, 28, 21), "teal1")
+    c.recolor(line(24, 15, 28, 12), "teal1")
+    # ball
+    ball = blob([(15.5, 8), (20, 9), (22.5, 13), (22.5, 18), (20, 22), (15.5, 23.5), (11, 22),
+                 (8.5, 18.5), (8.5, 13), (11, 9)])
+    c.cast(ball)
+    c.fill(ball, "red")
+    # two curved cream stripes
     for k in (-3, 3):
-        c.recolor(line(15 + k, 6, 12 + k, 25, 2) & body, "cream3")
-    c.fill({(11, 10), (12, 9), (13, 8), (10, 11), (9, 12)}, "red4")
-    # twist ties
-    c.rect(6, 13, 7, 18, "teal1")
-    c.rect(25, 13, 26, 18, "teal1")
+        s = line(14 + k, 8, 13 + k, 14) | line(13 + k, 14, 14 + k, 23)
+        c.recolor(s | {(x + 1, y) for x, y in s}, "cream3")
