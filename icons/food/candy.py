@@ -3,8 +3,8 @@ from pixelkit import blob, poly, line, rect
 
 def draw(c):
     # wrapper ends: tight knot at the ball, fan widening to the canvas edge, zig-zag outer edge
-    left = poly([(8, 15), (2, 10), (4, 12.5), (2, 15), (4, 17.5), (2, 20), (8, 16)]) | rect(7, 15, 8, 16)
-    right = poly([(23, 15), (29, 9), (27, 12), (29, 14.5), (27, 17.5), (29, 21), (23, 16)]) | rect(23, 15, 24, 16)
+    left = poly([(8, 15), (2, 10), (4, 12), (2, 14), (2, 16), (4, 18), (2, 20), (8, 16)]) | rect(7, 15, 8, 16)
+    right = poly([(23, 15), (29, 9), (27, 12), (29, 14), (29, 16), (27, 18), (29, 21), (23, 16)]) | rect(23, 15, 24, 16)
     c.fill(left, "teal2")
     c.fill(right, "teal2")
     # creases radiating from the knot

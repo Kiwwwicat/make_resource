@@ -180,6 +180,7 @@ def ellipse(cx, cy, rx, ry):
 def line(x0, y0, x1, y1, width=1):
     """브레젠험 직선. width>1 이면 오른쪽/아래로 두꺼워진다."""
     pts = set()
+    x0, y0, x1, y1 = round(x0), round(y0), round(x1), round(y1)
     dx, dy = abs(x1 - x0), -abs(y1 - y0)
     sx, sy = (1 if x0 < x1 else -1), (1 if y0 < y1 else -1)
     err, x, y = dx + dy, x0, y0
