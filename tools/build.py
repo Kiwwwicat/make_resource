@@ -59,6 +59,26 @@ def render(cat, icon_id):
     return img, c.lint()
 
 
+def to_svg(img):
+    """32x32 픽셀을 그대로 담은 SVG. viewBox는 0 0 32 32 고정, 같은 색 가로 구간은 사각형 하나로 묶는다.
+    확대해도 흐려지지 않도록 crispEdges 지정."""
+    w, h = img.size
+    rects = []
+    for y in range(h):
+        x = 0
+        while x < w:
+            px = img.getpixel((x, y))
+            if px[3] == 0:
+                x += 1
+                continue
+            x0 = x
+            while x < w and img.getpixel((x, y)) == px:
+                x += 1
+            rects.append(f'<rect x="{x0}" y="{y}" width="{x - x0}" height="1" fill="#{px[0]:02x}{px[1]:02x}{px[2]:02x}"/>')
+    return (f'<svg xmlns="http://www.w3.org/2000/svg" width="{w}" height="{h}" viewBox="0 0 {w} {h}" '
+            f'shape-rendering="crispEdges">\n' + "\n".join(rects) + "\n</svg>\n")
+
+
 def up(img, k):
     return img.resize((img.width * k, img.height * k), Image.NEAREST)
 
@@ -134,6 +154,9 @@ def build_category(cat):
             d = ROOT / "dist" / cat / f"{pk.SIZE * k}px"
             d.mkdir(parents=True, exist_ok=True)
             up(img, k).save(d / f"{iid}.png")
+        d = ROOT / "dist" / cat / "svg"
+        d.mkdir(parents=True, exist_ok=True)
+        (d / f"{iid}.svg").write_text(to_svg(img), encoding="utf-8")
     if done:
         cols = 8
         n_rows = (len(done) + cols - 1) // cols

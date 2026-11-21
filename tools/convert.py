@@ -3,6 +3,7 @@
 
   python tools/convert.py food/apple      source/food/apple.png -> pixels/food/apple.png
   python tools/convert.py food            source/food/*.png 전부
+  python tools/convert.py --sheet source/food/sheets/sheet01.png food a b c d   2x2 시트를 칸별로
 
 단계: ① 픽셀 격자 주기/위상 추정 ② 칸마다 대표색 추출 ③ 배경(마젠타) 제거
 ④ 30x30 안에 맞춤(필요 시 정수비 축소) ⑤ 마스터 팔레트로 양자화
@@ -44,7 +45,8 @@ def is_bg(a):
             continue
         seen[y, x] = True
         q.extend(((y + 1, x), (y - 1, x), (y, x + 1), (y, x - 1)))
-    return seen | (dist < 40)
+    saturated = key.max() - key.min() > 100   # 흰 배경이면 갇힌 흰색(크림 등)은 지우지 않는다
+    return seen | ((dist < 40) & saturated)
 
 
 def cell_size(a):
@@ -62,9 +64,11 @@ def cell_size(a):
     return float(np.argmax(sm))
 
 
-def find_grid(a):
-    """칸 크기 근처(±12%)에서 가로/세로 각각 (주기, 위상)을 정밀 추정."""
-    base = cell_size(a)
+def find_grid(a, base=None):
+    """칸 크기 근처에서 가로/세로 각각 (주기, 위상)을 정밀 추정.
+    base(시트 전체에서 구한 칸 크기)가 주어지면 ±5%, 아니면 자체 추정값 ±12%."""
+    tol = 0.05 if base else 0.12
+    base = base or cell_size(a)
     out = []
     f = a.astype(float)
     for axis in (1, 0):
@@ -72,7 +76,7 @@ def find_grid(a):
         d = d / (d.max() + 1e-9)
         best = (-1, base, 0)
         n = len(d)
-        for p in np.arange(base * 0.88, base * 1.12, 0.02):
+        for p in np.arange(base * (1 - tol), base * (1 + tol), 0.02):
             for o in np.arange(0, p, 0.5):
                 idx = np.round(np.arange(o, n, p)).astype(int)
                 idx = idx[(idx >= 0) & (idx < n)]
@@ -196,10 +200,10 @@ def clean(pix):
     return pix
 
 
-def convert(cat, icon_id):
-    src = ROOT / "source" / cat / f"{icon_id}.png"
-    a = np.array(Image.open(src).convert("RGB"))
-    grid = find_grid(a)
+def convert(cat, icon_id, a=None, base=None):
+    if a is None:
+        a = np.array(Image.open(ROOT / "source" / cat / f"{icon_id}.png").convert("RGB"))
+    grid = find_grid(a, base)
     cells, alpha = sample(a, grid)
     pix = quantize(cells, alpha)
     xs = [p[0] for p in pix]; ys = [p[1] for p in pix]
@@ -214,13 +218,31 @@ def convert(cat, icon_id):
     dest.parent.mkdir(parents=True, exist_ok=True)
     img.save(dest)
     note = "" if scale == 1 else f"  (축소 {scale:.2f}배)"
+    if max(raw) < 22:
+        note += "  ** 22칸 미만: 작게 나옴"
     print(f"{cat}/{icon_id}: 격자 {grid[0][0]:.2f}x{grid[1][0]:.2f}px, 원본 {raw[0]}x{raw[1]}칸{note}")
     return scale == 1
+
+
+def convert_sheet(path, cat, ids, cols=2):
+    """한 장에 여러 아이콘이 격자로 놓인 시트를 칸별로 잘라 변환. ids는 좌->우, 위->아래 순서,
+    건너뛸 칸은 '-'."""
+    a = np.array(Image.open(path).convert("RGB"))
+    rows = (len(ids) + cols - 1) // cols
+    h, w = a.shape[0] // rows, a.shape[1] // cols
+    base = cell_size(a)   # 한 시트의 아이콘들은 같은 픽셀 격자를 쓴다
+    for i, iid in enumerate(ids):
+        if iid != "-":
+            r, c = divmod(i, cols)
+            convert(cat, iid, a[r * h:(r + 1) * h, c * w:(c + 1) * w], base)
 
 
 def main(argv):
     if not argv:
         print(__doc__); return 2
+    if argv[0] == "--sheet":   # --sheet <png> <category> <id> <id> ...
+        convert_sheet(argv[1], argv[2], argv[3:])
+        return 0
     for t in argv:
         if "/" in t:
             convert(*t.split("/", 1))
